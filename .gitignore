@@ -1,0 +1,9 @@
+# Files
+*.DS_Store
+*.autosave
+*.swp
+
+
+# Directories (and thus their content)
+__pycache__/
+scripts/
