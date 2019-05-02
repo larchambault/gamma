@@ -16,17 +16,19 @@ class gamma:
    """
 
 
-   def __init__(self,dose_crit,dist_crit,vox_size = None,ref=None):
+   def __init__(self,dose_crit,dist_crit,threshold,vox_size = None,ref=None):
       """ initialization
 
           ref: reference dose distribution a 3D numpy array
           vox size: voxel size [x,y,z] in mm
           dose_crit: \Delta [percent of max]
           dist_crit: \delta [mm]
+          threshold: minimum dose below which gamma value is not computed [percent of max]
       """
 
       self.dist_crit = dist_crit
       self.dose_crit = dose_crit
+      self.min_threshold = threshold
       if vox_size is not None:
          self.set_voxel_size(vox_size)
       else:
@@ -56,6 +58,9 @@ class gamma:
       # absolute dose criterion = % of max
       max_dose =  np.max(ref)
       abs_dose_crit = max_dose*self.dose_crit/100.
+
+      # absolute threshold criterion
+      self.abs_min_threshold = self.min_threshold/100 * max_dose
 
       # Set the number of dose bins to match the voxel dose length (i.e. dd)
       # dd = dose_vox_size/abs_dose_crit

@@ -14,6 +14,9 @@ $(\mathbf x,d)$ on a testing dose distribution is simply the value at the same l
 
 - `numpy`
 - `scipy`
+- `scikit-fmm`
+   - Installed through anaconda or pip
+   - [github repository](https://github.com/scikit-fmm/scikit-fmm)
 
 ## Example of use
 
