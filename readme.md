@@ -35,8 +35,9 @@ gamma_map = g(test)
 
 ## To do:
 - [ ] Accelerate with masked arrays and `skfmm.distance`
+   - [ ] dose threshold to ignore low-dose voxels 
+   - [ ] Should default back to euclidean distance transform if skfmm not available
 - [ ] Better management of units
 - [ ] allow for sub-sampling or oversampling dose grid within the gamma class
-- [ ] dose threshold to ignore low-dose voxels (might require another librairy such as `skfmm`)
 - [x] Allow 2D gamma
 - [ ] option for local gamma
