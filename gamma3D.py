@@ -34,7 +34,7 @@ class gamma:
       self.min_threshold = threshold
       self.set_voxel_size(vox_size)
       self.ndim = len(self.vox_size)
-      print(f'Image dimensions: {self.ndim}')
+      # print(f'Image dimensions: {self.ndim}')
       self.max_dose_pct = 120 # [%], fraction of maximum to use as the upper dose bin
 
       # empty initialization, waiting for ref image
@@ -57,7 +57,7 @@ class gamma:
       dx = self.vox_size/self.dist_crit # voxel dimensions expressed as fx of criterion
       dd = np.mean(dx) # dimension along dose axis should be the same as space axis.
                        # Dose bins are set afterward
-      print(dx,dd)
+      # print(dx,dd)
 
       # absolute dose criterion = % of max
       max_dose =  np.max(ref)
@@ -97,7 +97,7 @@ class gamma:
 
       lookup = np.digitize(self.ref_img,self.dbins) - 1 # lookup contains the index of dose bins
 
-      print(f'Dose bins = {self.ndbins}')
+      # print(f'Dose bins = {self.ndbins}')
 
       for i in range(self.ndbins):
          dose_points = lookup == i
@@ -205,7 +205,7 @@ class gamma:
 
       lookup = np.digitize(img,self.dbins) - 1 # values to lookup in dist_map
       gamma_map = np.ones(img.shape)*999 # initialize
-      print(gamma_map.shape)
+      # print(gamma_map.shape)
 
       #gamma values corrresponds to the pixel values on dist_map at the location of img
       for i in range(self.ndbins):
