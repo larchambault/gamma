@@ -7,7 +7,7 @@ Created on 2018-12-06
 import numpy as np
 from scipy.ndimage.morphology import distance_transform_edt as edt
 
-# import skfmm # [scikit-fmm](https://github.com/scikit-fmm/scikit-fmm)
+import skfmm # [scikit-fmm](https://github.com/scikit-fmm/scikit-fmm)
 
 class gamma:
    """ Gamma calculation (global) based on Chen et al. 2009
