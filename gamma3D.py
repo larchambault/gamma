@@ -97,6 +97,10 @@ class gamma:
 
       lookup = np.digitize(self.ref_img,self.dbins) - 1 # lookup contains the index of dose bins
 
+      # set all values below threshold to threshold
+      # bin_threshold = np.digitize([x],self.dbins) - 1
+      # lookup[lookup < bin_threshold] = bin_threshold
+
       # print(f'Dose bins = {self.ndbins}')
 
       for i in range(self.ndbins):
@@ -117,6 +121,7 @@ class gamma:
 
       # print(self.delta)
       dst = edt(hypSurf,sampling=self.delta)
+      # dst = skfmm.distance(hypSurf)
 
       self.dist_map = dst
 
