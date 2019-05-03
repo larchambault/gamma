@@ -7,7 +7,7 @@ Created on 2018-12-06
 import numpy as np
 from scipy.ndimage.morphology import distance_transform_edt as edt
 
-import skfmm # [scikit-fmm](https://github.com/scikit-fmm/scikit-fmm)
+# import skfmm # [scikit-fmm](https://github.com/scikit-fmm/scikit-fmm)
 
 class gamma:
    """ Gamma calculation (global) based on Chen et al. 2009
@@ -31,7 +31,7 @@ class gamma:
 
       self.dist_crit = dist_crit
       self.dose_crit = dose_crit
-      self.min_threshold = threshold
+      self.min_threshold_pct = threshold
       self.set_voxel_size(vox_size)
       self.ndim = len(self.vox_size)
       # print(f'Image dimensions: {self.ndim}')
@@ -64,10 +64,10 @@ class gamma:
       abs_dose_crit = max_dose*self.dose_crit/100.
 
       # absolute threshold criterion
-      if self.min_threshold:
-         self.abs_min_threshold = self.min_threshold/100 * max_dose
+      if self.min_threshold_pct:
+         self.min_threshold = self.min_threshold_pct/100 * max_dose
       else:
-         self.abs_min_threshold = None
+         self.min_threshold = None
 
       # Set the number of dose bins to match the voxel dose length (i.e. dd)
       # dd = dose_vox_size/abs_dose_crit
@@ -83,7 +83,6 @@ class gamma:
       self.ndbins = ndbins
       self.dbins = dbins
 
-
       self.compute_dist_map()
 
    def compute_dist_map(self):
@@ -97,12 +96,6 @@ class gamma:
 
       lookup = np.digitize(self.ref_img,self.dbins) - 1 # lookup contains the index of dose bins
 
-      # set all values below threshold to threshold
-      # bin_threshold = np.digitize([x],self.dbins) - 1
-      # lookup[lookup < bin_threshold] = bin_threshold
-
-      # print(f'Dose bins = {self.ndbins}')
-
       for i in range(self.ndbins):
          dose_points = lookup == i
          if self.ndim == 3:
@@ -111,15 +104,18 @@ class gamma:
             hypSurf = self._interp_dose_along_ax3(hypSurf,lookup,0)
             hypSurf = self._interp_dose_along_ax3(hypSurf,lookup,1)
             hypSurf = self._interp_dose_along_ax3(hypSurf,lookup,2)
+            # Here, we could try to mask layer by layer all position of pixels below threshold
+            # to speed up calculation (only w/ skfmm)
          elif self.ndim == 2:
             hypSurf[:,:,i][dose_points] = 0
             # simple (naive) interpolation. See Fig. 2 au Chen 2009
             hypSurf = self._interp_dose_along_ax2(hypSurf,lookup,0)
             hypSurf = self._interp_dose_along_ax2(hypSurf,lookup,1)
+            # Here, we could try to mask layer by layer all position of pixels below threshold
+            # to speed up calculation (only w/ skfmm)
          else:
             raise IndexError('Only 2 and 3 spatial dimension supported at this moment')
 
-      # print(self.delta)
       dst = edt(hypSurf,sampling=self.delta)
       # dst = skfmm.distance(hypSurf)
 
@@ -221,6 +217,11 @@ class gamma:
             gamma_map[test_points] = self.dist_map[:,:,i][test_points]
          else:
             raise IndexError('Only 2 and 3 spatial dimension supported at this moment')
+
+      if self.min_threshold:
+         msk = self.ref_img < self.min_threshold
+         gamma_map = np.ma.array(gamma_map,mask=msk)
+
       return gamma_map
 
    def __call__(self,img):
