@@ -38,5 +38,5 @@ gamma_map = g(test)
 - [ ] Better management of units
 - [ ] allow for sub-sampling or oversampling dose grid within the gamma class
 - [ ] dose threshold to ignore low-dose voxels (might require another librairy such as `skfmm`)
-- [ ] Allow 2D gamma
+- [x] Allow 2D gamma
 - [ ] option for local gamma

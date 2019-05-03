@@ -48,13 +48,16 @@ class gamma:
          self.set_reference(ref)
 
    def set_voxel_size(self,vox_size):
-      self.vox_size = np.array(vox_size) # calling np.array does nothing if vox_size is already a ndarray
+      self.vox_size = np.array(vox_size) # calling np.array does nothing
+                                         # if vox_size is already a ndarray
 
    def set_reference(self,ref):
 
       # dx -> x,y,z distance as fx of distance criterion
       dx = self.vox_size/self.dist_crit # voxel dimensions expressed as fx of criterion
-      dd = np.mean(dx) # dimension along dose axis should be the same as space axis. Dose bins are set afterward
+      dd = np.mean(dx) # dimension along dose axis should be the same as space axis.
+                       # Dose bins are set afterward
+      print(dx,dd)
 
       # absolute dose criterion = % of max
       max_dose =  np.max(ref)
@@ -94,6 +97,8 @@ class gamma:
 
       lookup = np.digitize(self.ref_img,self.dbins) - 1 # lookup contains the index of dose bins
 
+      print(f'Dose bins = {self.ndbins}')
+
       for i in range(self.ndbins):
          dose_points = lookup == i
          if self.ndim == 3:
@@ -103,20 +108,12 @@ class gamma:
             hypSurf = self._interp_dose_along_ax3(hypSurf,lookup,1)
             hypSurf = self._interp_dose_along_ax3(hypSurf,lookup,2)
          elif self.ndim == 2:
-            print('allo')
             hypSurf[:,:,i][dose_points] = 0
             # simple (naive) interpolation. See Fig. 2 au Chen 2009
             hypSurf = self._interp_dose_along_ax2(hypSurf,lookup,0)
-            print('allo2')
             hypSurf = self._interp_dose_along_ax2(hypSurf,lookup,1)
-            print('allo3')
          else:
             raise IndexError('Only 2 and 3 spatial dimension supported at this moment')
-
-      # DEBUG
-      # make sure hypsurf is correctly interpolated in 2D
-      self.hyp = hypSurf
-      return 0
 
       # print(self.delta)
       dst = edt(hypSurf,sampling=self.delta)
@@ -213,8 +210,12 @@ class gamma:
       #gamma values corrresponds to the pixel values on dist_map at the location of img
       for i in range(self.ndbins):
          test_points = lookup == i
-         gamma_map[test_points] = self.dist_map[:,:,:,i][test_points]
-
+         if self.ndim == 3:
+            gamma_map[test_points] = self.dist_map[:,:,:,i][test_points]
+         elif self.ndim == 2:
+            gamma_map[test_points] = self.dist_map[:,:,i][test_points]
+         else:
+            raise IndexError('Only 2 and 3 spatial dimension supported at this moment')
       return gamma_map
 
    def __call__(self,img):
